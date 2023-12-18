@@ -1,0 +1,70 @@
+#Dataset = wine_data
+
+import pandas as pd
+import numpy as np
+from sklearn.datasets import load_wine
+
+wine = load_wine()
+
+my_df = pd.DataFrame(wine.data,columns=wine.feature_names)
+
+# Add the target
+my_df['target']=wine.target
+
+# Split the data into x and y
+X = my_df.drop('target', axis=1)
+y = my_df['target']
+X.shape, y.shape
+
+from sklearn.model_selection import train_test_split
+# Split the data into training and testing
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=38)
+
+#print out the shape of training and testing sets
+print("Shape of Training set : ", X_train.shape, y_train.shape)
+print("Shape of Testing set : ", X_test.shape, y_test.shape)
+
+# import linearRegression model
+from sklearn.linear_model import LinearRegression
+
+# create linearRegression model
+lr = LinearRegression()
+# Train the model 
+lr.fit(X_train, y_train)
+
+# prediction  on the testing set
+y_pred = lr.predict(X_test)
+y_pred.shape
+
+# Import some metrics for calculation
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+
+#Evaluate the model performance 
+r2 = r2_score(y_test, y_pred)
+mse = mean_squared_error(y_test, y_pred)
+mae = mean_absolute_error(y_test, y_pred)
+intercept = lr.intercept_
+
+print("R2 score: ", r2)
+print("mean squared error : ", mse)
+print("mean aabsolute error : ", mae)
+print("Intercept : ", intercept)
+
+import matplotlib.pyplot as plt
+#plot the predicted vs actual values
+#predicted value of the target are plotted on x-axis
+#Actual values of the target are plotted on y-axis
+
+plt.scatter(y_test, y_pred, alpha=0.5)
+plt.plot([y.min(), y.max()], [y.min(), y.max()], color="red")
+plt.xlabel("Actual Values")
+plt.ylabel("Predicted Values")
+plt.title("Predicted vs Actual Values (Linear Regression)")
+plt.show()
+
+# plot the residual graph
+plt.scatter(y_pred, y_test - y_pred, alpha=0.5)
+plt.xlabel("Predicted Values")
+plt.ylabel("Residuals")
+plt.title("Residual Plot (Linear Regression)")
+plt.show()
