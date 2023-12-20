@@ -1,0 +1,52 @@
+# Bar Graph/Plot
+
+import matplotlib.pyplot as plt
+# Source: TIOBE Index
+x = ["Python", "C", "PHP", "C++", "SQL", "Java", "Javascript", "C#"]
+# Rating of Each language by percentage
+y = [13.86, 11.44, 2.01, 10.01, 1.61, 7.99, 2.90, 7.30]
+plt.xlabel("Languages", fontsize=12)
+plt.ylabel("Rating in Percentage", fontsize=12)
+plt.title("December Rating 2023")
+plt.bar(x,y, width = 0.5, edgecolor = "black", linewidth=2)
+plt.legend()
+plt.show()
+
+#Stem Plot
+
+import matplotlib.pyplot as plt
+x = [1, 2, 3, 4, 5, 6]
+y = [2, 2, 5, 6, 4, 3]
+
+plt.stem(x,y, basefmt="g", label = "Python", markerfmt = "black")
+plt.legend()
+plt.show()
+
+
+#Step Plot
+import matplotlib.pyplot as plt
+x=[1,2,3,4,5,6,7,8,9]
+y=[5,6,9,6,4,8,3,4,7]
+
+plt.step(x,y, ms=20, mfc="black", linewidth=2.5)
+plt.title("Experiment")
+plt.xlabel(" x - axis ")
+plt.ylabel(" y - axis ")
+plt.grid(True)
+plt.show()
+
+# Histogram
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Generating random data for the histogram
+data = np.random.randn(1000)  # Generating 1000 random data points from a standard normal distribution
+
+# Creating the histogram
+plt.hist(data, bins=30, color='skyblue', edgecolor='black')  # Plotting the histogram with 30 bins, skyblue bars, and black edges
+plt.xlabel('Values')
+plt.ylabel('Frequency')
+plt.title('Histogram Example')
+plt.grid(True)  # Add gridlines for better visualization
+plt.show()
