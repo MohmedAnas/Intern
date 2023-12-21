@@ -1,0 +1,42 @@
+import mnist
+from sklearn.svm import LinearSVC
+import warnings
+import pickle
+from matplotlib import pyplot as plt
+
+# Suppress FutureWarning about 'dual' parameter
+warnings.filterwarnings('ignore', category=FutureWarning)
+
+# Loading MNIST dataset
+x_train = mnist.train_images()
+y_train = mnist.train_labels()
+x_test = mnist.test_images()
+y_test = mnist.test_labels()
+
+n_samples, nx, ny = x_train.shape
+n_samples_test, nx_test, ny_test = x_test.shape
+x_train = x_train.reshape((n_samples, nx*ny))
+x_test_ = x_test.reshape((n_samples_test, nx_test*ny_test))
+
+# Loading the pre-trained model if it exists
+try:
+    with open("mnist.pickle", "rb") as model_file:
+        svm = pickle.load(model_file)
+except FileNotFoundError:
+    # Training the model if the file doesn't exist
+    svm = LinearSVC()
+    svm.fit(x_train, y_train)
+    acc = svm.score(x_train, y_train)
+    if acc >= 0.87:
+        with open("mnist.pickle", "wb") as model_file:
+            pickle.dump(svm, model_file)
+        print("Model trained and saved.")
+
+# Using the loaded or trained model for predictions
+predict = svm.predict(x_test_)
+
+# Displaying predictions
+for i in range(len(predict)):
+    plt.imshow(x_test[i])
+    print("Predicted Label:", predict[i])
+    plt.show()
