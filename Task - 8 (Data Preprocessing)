@@ -1,0 +1,57 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import LabelEncoder
+
+# Creating the dataset
+data = {
+    'Name': ['Charizard', 'Bulbasaur', 'Butterfree', 'weedle', 'beedrill', 'Pidgeot', 'Raticat', 'Arbok', 'Pikachu', 'Sandslash'],
+    'HP': [78, 45, 60, 40, 65, 83, 55, None, 75, None],  
+    'Attack': [84, 49, 45, 34, 43, 69, 54, None, 72, None],  
+    'Defense': [84, 49, None, 46, 25, 35, 53, 32, 67, 66],
+    'Speed': [100, 45, 55, 25, 76, 89, 54, 55, 87, 45],
+    'Is_Epic': [1, 0, 0, 0, 0, 1, 0, 0, 1, 0] 
+}
+
+# Creating a DataFrame from the provided dataset
+df = pd.DataFrame(data)
+
+# Cleaning the data by handling missing values
+imputer = SimpleImputer(strategy='mean')
+df['HP'] = imputer.fit_transform(df[['HP']])
+df['Attack'] = imputer.fit_transform(df[['Attack']])
+df['Defense'] = imputer.fit_transform(df[['Defense']])
+
+# Assessing data quality (checking for missing values)
+missing_values = df.isnull().sum()
+print("Missing Values:")
+print(missing_values)
+
+# Encoding categorical data 
+label_encoder = LabelEncoder()
+df['Name_encoded'] = label_encoder.fit_transform(df['Name'])
+
+# Splitting the dataset into features (X) and target variable (y)
+X = df.drop(['Name', 'Speed', 'Is_Epic'], axis=1)  # Features (excluding 'Name', 'Speed', and 'Is_Epic' columns)
+y = df['Is_Epic']  # Target variable ('Is_Epic')
+
+# Splitting the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Scaling the features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Reducing the data 
+dimension_reduction = PCA(n_components=2)
+X_train_reduced = dimension_reduction.fit_transform(X_train_scaled)
+X_test_reduced = dimension_reduction.transform(X_test_scaled)
+
+# Displaying results 
+print("\nTraining Set after Dimension Reduction:")
+print(X_train_reduced)
+print("\nTesting Set after Dimension Reduction:")
+print(X_test_reduced)
