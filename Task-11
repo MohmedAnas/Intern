@@ -1,0 +1,92 @@
+# Import necessary libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Data is Sorted from A to Z
+file_path = r"C:\Users\admin\Downloads\archive (5)\smartphones.csv"
+df = pd.read_csv(file_path)
+df
+
+# Assessing data quality (checking for missing values)
+missing_values = df.isnull().sum()
+print("Missing Values:")
+print(missing_values)
+
+# filling missing values
+df1= df.dropna()
+df1.isnull().sum()
+
+import matplotlib.pyplot as plt
+import pandas as pd
+
+
+numeric_columns = df.select_dtypes(include='number').columns.tolist()
+
+# Summing values across numeric columns
+data_sum = df[numeric_columns].sum()
+
+# Get the top 10 columns by sum
+top_columns = data_sum.nlargest(10)  
+# Create a bar chart for the top columns
+plt.figure(figsize=(10, 6))
+top_columns.plot(kind='bar', color='skyblue')
+plt.xlabel('Columns')
+plt.ylabel('Sum')
+plt.title('Top Columns by Sum')
+plt.xticks(rotation=45)  
+plt.tight_layout()
+
+plt.show()
+
+correlation_matrix = df.corr()
+plt.figure(figsize=(12, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f')
+plt.title('Correlation Heatmap')
+plt.show()
+
+# Identify strongly correlated variables
+threshold = 0.7  # Set the correlation threshold
+strong_correlations = correlation_matrix[(correlation_matrix.abs() > threshold) & (correlation_matrix < 1.0)]
+strong_correlations = strong_correlations.unstack().dropna().reset_index()
+strong_correlations.columns = ['Variable 1', 'Variable 2', 'Correlation']
+strong_correlations['Correlation'] = strong_correlations['Correlation'].round(2)
+
+strong_correlations = strong_correlations[strong_correlations['Correlation'] != 1.0]  
+strong_correlations = strong_correlations.sort_values(by='Correlation', ascending=False)
+print("Strongly correlated variables:")
+print(strong_correlations)
+
+# Cramers' V Method
+import matplotlib.pyplot as plt
+from scipy.stats import chi2_contingency
+
+
+categorical_columns = df.select_dtypes(include='object').columns.tolist()
+
+# Calculating Cramer's V for each pair of categorical columns
+def cramers_v(confusion_matrix):
+    chi2 = chi2_contingency(confusion_matrix)[0]
+    n = confusion_matrix.sum().sum()
+    phi2 = chi2 / n
+    r, k = confusion_matrix.shape
+    phi2corr = max(0, phi2 - ((k - 1) * (r - 1)) / (n - 1))
+    rcorr = r - ((r - 1) ** 2) / (n - 1)
+    kcorr = k - ((k - 1) ** 2) / (n - 1)
+    return np.sqrt(phi2corr / min((kcorr - 1), (rcorr - 1)))
+
+# Calculate Cramer's V for each pair of categorical columns
+cramer_v_matrix = pd.DataFrame(index=categorical_columns, columns=categorical_columns, dtype=float)
+
+for i in range(len(categorical_columns)):
+    for j in range(len(categorical_columns)):
+        confusion_matrix = pd.crosstab(df[categorical_columns[i]], df[categorical_columns[j]])
+        cramers_val = cramers_v(confusion_matrix)
+        cramer_v_matrix.iloc[i, j] = cramers_val
+
+# Plotting Cramer's V matrix as a heatmap
+plt.figure(figsize=(10, 8))
+sns.heatmap(cramer_v_matrix, annot=True, cmap='coolwarm', fmt='.2f')
+plt.title("Cramer's V Heatmap for Categorical Variables")
+plt.show()
